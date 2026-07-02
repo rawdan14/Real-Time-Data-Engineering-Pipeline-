@@ -1,0 +1,42 @@
+agent.sources  = logSource
+agent.channels = memChannel
+agent.sinks    = kafkaSink
+ 
+# ============================================================
+# SOURCE  — reads every new line appended to the log file
+# ============================================================
+agent.sources.logSource.type          = exec
+agent.sources.logSource.command       = tail -F /home/asf/realtime-project
+ 
+agent.sources.logSource.channels      = memChannel
+agent.sources.logSource.batchSize     = 20
+agent.sources.logSource.batchTimeout  = 3000
+# restart source automatically if tail exits for any reason
+agent.sources.logSource.restart       = true
+agent.sources.logSource.restartThrottle = 10000
+ 
+ 
+# ============================================================
+# CHANNEL  — in-memory buffer between source and sink
+# ============================================================
+agent.channels.memChannel.type                = memory
+agent.channels.memChannel.capacity            = 10000
+agent.channels.memChannel.transactionCapacity = 1000
+# If you need durability across restarts, swap to file channel:
+#   agent.channels.memChannel.type             = file
+#   agent.channels.memChannel.checkpointDir    = /tmp/flume/checkpoint
+#   agent.channels.memChannel.dataDirs         = /tmp/flume/data
+ # ============================================================
+# SINK  — publishes each event to a Kafka topic
+# ============================================================
+agent.sinks.kafkaSink.type                          = org.apache.flume.sink.kafka.KafkaSink
+agent.sinks.kafkaSink.channel                       = memChannel
+agent.sinks.kafkaSink.kafka.bootstrap.servers       = localhost:9092
+agent.sinks.kafkaSink.kafka.topic                   = openaq-data
+agent.sinks.kafkaSink.kafka.flumeBatchSize          = 20
+agent.sinks.kafkaSink.kafka.producer.acks           = 1
+agent.sinks.kafkaSink.kafka.producer.linger.ms      = 5
+agent.sinks.kafkaSink.kafka.producer.compression.type = snappy
+# Optional: use a header value as the Kafka message key
+# agent.sinks.kafkaSink.kafka.partitionIdHeader     = partitionId
+ 
