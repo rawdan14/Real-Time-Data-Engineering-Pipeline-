@@ -3,7 +3,7 @@
 A scalable, end-to-end data engineering project designed to ingest, process, and visualize environmental data in real-time while maintaining a historical batch archive.
 
 ## Architecture
-![Architecture Diagram]()
+![Architecture Diagram](diagram.jpg)
 
 ## Overview
 This pipeline follows a Lambda architecture to handle data in two ways:
